@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pure switch</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: #000000;
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* без карточки, просто контейнер для кнопки и статуса */
+  .panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 36px;
+  }
+
+  /* круглая кнопка включения/выключения */
+  .power-btn {
+    width: 120px;
+    height: 120px;
+    border-radius: 60px;
+    border: 2px solid #2a2a2a;
+    background: #0a0a0a;
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #4a4a4a;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+  }
+
+  .power-btn.active {
+    border-color: #2ecc71;
+    color: #2ecc71;
+    background: #0d1f12;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.3);
+  }
+
+  .power-btn:hover {
+    border-color: #e67e22;
+    color: #e67e22;
+    background: #1c1108;
+  }
+
+  /* строка статуса — минималистично, без времени */
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+    padding: 8px 16px;
+    border-radius: 40px;
+  }
+
+  /* индикатор (светодиод) */
+  .led {
+    width: 12px;
+    height: 12px;
+    border-radius: 12px;
+    background: #2a2a2a;
+    transition: all 0.2s;
+  }
+
+  .led.off {
+    background: #c0392b;
+    box-shadow: 0 0 4px #c0392b66;
+  }
+
+  .led.on {
+    background: #2ecc71;
+    box-shadow: 0 0 8px #2ecc71cc;
+  }
+
+  .status-text {
+    font-size: 13px;
+    font-weight: 400;
+    color: #dddddd;
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+<div class="panel">
+  <!-- только кнопка -->
+  <button class="power-btn" id="powerToggle">OFF</button>
+  
+  <!-- только состояние + индикатор, без времени -->
+  <div class="status-row">
+    <div class="led off" id="statusLed"></div>
+    <span class="status-text" id="statusMessage">система выключена</span>
+  </div>
+</div>
+
+<script>
+  let isOn = false;
+
+  const powerBtn = document.getElementById('powerToggle');
+  const led = document.getElementById('statusLed');
+  const msgSpan = document.getElementById('statusMessage');
+
+  function updateInterface() {
+    if (isOn) {
+      powerBtn.textContent = 'ON';
+      powerBtn.classList.add('active');
+      led.className = 'led on';
+      msgSpan.textContent = 'система активна';
+    } else {
+      powerBtn.textContent = 'OFF';
+      powerBtn.classList.remove('active');
+      led.className = 'led off';
+      msgSpan.textContent = 'система выключена';
+    }
+  }
+
+  function togglePower() {
+    isOn = !isOn;
+    updateInterface();
+  }
+
+  powerBtn.addEventListener('click', togglePower);
+  updateInterface();
+</script>
+</body>
+</html>
