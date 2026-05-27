@@ -22,7 +22,6 @@
     justify-content: center;
   }
 
-  /* без карточки, просто контейнер для кнопки и статуса */
   .panel {
     display: flex;
     flex-direction: column;
@@ -31,7 +30,6 @@
     gap: 36px;
   }
 
-  /* круглая кнопка включения/выключения */
   .power-btn {
     width: 120px;
     height: 120px;
@@ -61,7 +59,6 @@
     background: #1c1108;
   }
 
-  /* строка статуса — минималистично, без времени */
   .status-row {
     display: flex;
     align-items: center;
@@ -71,7 +68,6 @@
     border-radius: 40px;
   }
 
-  /* индикатор (светодиод) */
   .led {
     width: 12px;
     height: 12px;
@@ -103,7 +99,6 @@
   <!-- только кнопка -->
   <button class="power-btn" id="powerToggle">OFF</button>
   
-  <!-- только состояние + индикатор, без времени -->
   <div class="status-row">
     <div class="led off" id="statusLed"></div>
     <span class="status-text" id="statusMessage">система выключена</span>
