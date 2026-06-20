@@ -3,100 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>pure switch</title>
+<title>pure switch — robot arm power</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
 
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     background: #000000;
     font-family: 'Space Mono', monospace;
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
   }
 
   .panel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 36px;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 36px;
   }
 
   .power-btn {
-    width: 120px;
-    height: 120px;
-    border-radius: 60px;
-    border: 2px solid #2a2a2a;
-    background: #0a0a0a;
-    font-family: 'Space Mono', monospace;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: #4a4a4a;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    width: 120px; height: 120px; border-radius: 60px;
+    border: 2px solid #2a2a2a; background: #0a0a0a;
+    font-family: 'Space Mono', monospace; font-size: 18px;
+    font-weight: 700; letter-spacing: 0.12em; color: #4a4a4a;
+    cursor: pointer; transition: all 0.2s ease;
     box-shadow: 0 0 0 rgba(0,0,0,0);
   }
-
   .power-btn.active {
-    border-color: #2ecc71;
-    color: #2ecc71;
-    background: #0d1f12;
-    box-shadow: 0 0 8px rgba(46, 204, 113, 0.3);
+    border-color: #2ecc71; color: #2ecc71;
+    background: #0d1f12; box-shadow: 0 0 8px rgba(46, 204, 113, 0.3);
   }
-
   .power-btn:hover {
-    border-color: #e67e22;
-    color: #e67e22;
-    background: #1c1108;
+    border-color: #e67e22; color: #e67e22; background: #1c1108;
   }
 
   .status-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: transparent;
-    padding: 8px 16px;
-    border-radius: 40px;
+    display: flex; align-items: center; gap: 12px;
+    background: transparent; padding: 8px 16px; border-radius: 40px;
   }
 
   .led {
-    width: 12px;
-    height: 12px;
-    border-radius: 12px;
-    background: #2a2a2a;
-    transition: all 0.2s;
+    width: 12px; height: 12px; border-radius: 12px;
+    background: #2a2a2a; transition: all 0.2s;
   }
-
-  .led.off {
-    background: #c0392b;
-    box-shadow: 0 0 4px #c0392b66;
-  }
-
-  .led.on {
-    background: #2ecc71;
-    box-shadow: 0 0 8px #2ecc71cc;
-  }
+  .led.off { background: #c0392b; box-shadow: 0 0 4px #c0392b66; }
+  .led.on  { background: #2ecc71; box-shadow: 0 0 8px #2ecc71cc; }
 
   .status-text {
-    font-size: 13px;
-    font-weight: 400;
-    color: #dddddd;
-    letter-spacing: 0.04em;
+    font-size: 13px; font-weight: 400; color: #dddddd; letter-spacing: 0.04em;
   }
 </style>
 </head>
 <body>
 <div class="panel">
-  <!-- только кнопка -->
   <button class="power-btn" id="powerToggle">OFF</button>
   
   <div class="status-row">
@@ -107,7 +66,6 @@
 
 <script>
   let isOn = false;
-
   const powerBtn = document.getElementById('powerToggle');
   const led = document.getElementById('statusLed');
   const msgSpan = document.getElementById('statusMessage');
@@ -126,13 +84,41 @@
     }
   }
 
-  function togglePower() {
+  // отправляем новое состояние на сервер
+  async function sendState(state) {
+    try {
+      await fetch('/power', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ state: state })
+      });
+    } catch (e) {
+      console.warn('не удалось отправить состояние на сервер', e);
+    }
+  }
+
+  // переключение по клику
+  async function togglePower() {
     isOn = !isOn;
+    updateInterface();
+    await sendState(isOn);
+  }
+
+  // при загрузке получаем текущее состояние с сервера
+  async function loadInitialState() {
+    try {
+      const res = await fetch('/power');
+      const data = await res.json();
+      isOn = data.state;
+    } catch (e) {
+      console.warn('не удалось загрузить состояние, оставляем OFF', e);
+      isOn = false;
+    }
     updateInterface();
   }
 
   powerBtn.addEventListener('click', togglePower);
-  updateInterface();
+  loadInitialState();
 </script>
 </body>
 </html>
